@@ -2,27 +2,25 @@
 
 namespace App\Controller;
 
-use App\Entity\{User, Domain, IpAddress, SslCert, DomainAlias, Php, SystemUser};
-use App\Message\{ServiceRestart, RegenerateConfigs};
-use App\Service\{ConfigGeneratorService, OsFunctionsService};
-
+use App\Entity\{Domain, DomainAlias, IpAddress, Php, SslCert, SystemUser, User};
+use App\Message\{RegenerateConfigs, ServiceRestart};
+use App\Service\{ConfigGeneratorService, DnsService, OsFunctionsService};
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud, Dashboard, MenuItem, UserMenu};
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-
-use Symfony\Component\HttpFoundation\{Response, HeaderUtils, RequestStack};
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
+use Symfony\Component\HttpFoundation\{HeaderUtils, RequestStack, Response};
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private RequestStack $requestStack,
-    ) {
+    )
+    {
     }
 
     #[Route('/', name: 'admin_dashboard')]
@@ -55,7 +53,7 @@ class DashboardController extends AbstractDashboardController
         ];
 
         $configFiles = $osFunctions->getConfigs(true);
-        $cgs = new ConfigGeneratorService($entityManager, $this->container->get('twig'), $osFunctions, new \App\Service\DnsService());
+        $cgs = new ConfigGeneratorService($entityManager, $this->container->get('twig'), $osFunctions, new DnsService());
         $renderedFiles = $cgs->renderConfigFiles();
         $allFiles = [];
         $allFileNames = array_merge(array_keys($configFiles), array_keys($renderedFiles));
@@ -67,11 +65,11 @@ class DashboardController extends AbstractDashboardController
 
             if ($existing === '') {
                 $status = 'missing';
-            }elseif ($rendered === '') {
+            } elseif ($rendered === '') {
                 $status = 'for-deletion';
-            }elseif ($existing === $rendered) {
+            } elseif ($existing === $rendered) {
                 $status = 'ok';
-            }else{
+            } else {
                 $status = 'outdated';
             }
 
@@ -97,7 +95,7 @@ class DashboardController extends AbstractDashboardController
         if (in_array($service, $managedServices)) {
             $bus->dispatch(new ServiceRestart($service));
             $this->addFlash('info', 'Service ' . str_replace('.service', '', $service) . ' restart requested');
-        }else{
+        } else {
             $this->addFlash('error', 'Service ' . $service . ' is not managed!');
         }
 
@@ -150,8 +148,7 @@ class DashboardController extends AbstractDashboardController
     {
         return Crud::new()
             ->setPaginatorPageSize(50)
-            ->showEntityActionsInlined()
-        ;
+            ->showEntityActionsInlined();
     }
 
     public function configureMenuItems(): iterable
@@ -162,7 +159,7 @@ class DashboardController extends AbstractDashboardController
          * @see https://github.com/EasyCorp/EasyAdminBundle/issues/6550
          */
         // yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToUrl('Dashboard', 'fa fa-home',  $this->generateUrl('admin_dashboard'));
+        yield MenuItem::linkToUrl('Dashboard', 'fa fa-home', $this->generateUrl('admin_dashboard'));
 
         yield MenuItem::section('Hosting configuration');
         yield MenuItem::linkToCrud('User', 'fas fa-user', User::class);
@@ -200,7 +197,6 @@ class DashboardController extends AbstractDashboardController
             })
             ->update(Crud::PAGE_DETAIL, Action::EDIT, static function (Action $action) {
                 return $action->setIcon('fa fa-edit');
-            })
-            ;
+            });
     }
 }

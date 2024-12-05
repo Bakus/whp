@@ -3,10 +3,10 @@
 namespace App\MessageHandler;
 
 use App\Message\RegenerateConfigs;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
 use App\Service\{ConfigGeneratorService, OsFunctionsService};
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\TexterInterface;
 
@@ -17,8 +17,8 @@ class RegenerateConfigsHandler
     public function __construct(
         private ConfigGeneratorService $configGenerator,
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService $osFunctions,
-        private TexterInterface $texter,
+        private OsFunctionsService     $osFunctions,
+        private TexterInterface        $texter,
     )
     {
     }
@@ -40,7 +40,7 @@ class RegenerateConfigsHandler
             foreach ($phps as $version) {
                 $this->osFunctions->restartService('php' . $version . '-fpm');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $sms = new SmsMessage('+48693843399', 'Error while restarting services: ' . $e->getMessage());
             $this->texter->send($sms);
         }

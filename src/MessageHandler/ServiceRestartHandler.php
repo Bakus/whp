@@ -3,9 +3,8 @@
 namespace App\MessageHandler;
 
 use App\Message\ServiceRestart;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
 use App\Service\OsFunctionsService;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class ServiceRestartHandler

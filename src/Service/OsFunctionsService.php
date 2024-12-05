@@ -2,9 +2,10 @@
 
 namespace App\Service;
 
-// use App\Kernel;
-use Symfony\Component\Process\Process;
+use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 class OsFunctionsService
 {
@@ -32,11 +33,11 @@ class OsFunctionsService
     {
         $os = PHP_OS_FAMILY;
         if ($os != 'Linux') {
-            throw new \RuntimeException('Only Linux is supported!');
+            throw new RuntimeException('Only Linux is supported!');
         }
 
         if (!file_exists('/etc/os-release')) {
-            throw new \RuntimeException('Cannot determine OS: /etc/os-release does not exist');
+            throw new RuntimeException('Cannot determine OS: /etc/os-release does not exist');
         }
 
         $osRelease = file_get_contents('/etc/os-release');
@@ -47,13 +48,13 @@ class OsFunctionsService
             case 'ubuntu':
                 return self::OS_UBUNTU;
         }
-        throw new \RuntimeException('Unsupported operating system found: ' . $matches['os'] . '. Only Debian and Ubuntu are supported.');
+        throw new RuntimeException('Unsupported operating system found: ' . $matches['os'] . '. Only Debian and Ubuntu are supported.');
     }
 
     public function getOsCodename(): string
     {
         if (!file_exists('/etc/os-release')) {
-            throw new \RuntimeException('Cannot determine OS: /etc/os-release does not exist');
+            throw new RuntimeException('Cannot determine OS: /etc/os-release does not exist');
         }
 
         $osRelease = file_get_contents('/etc/os-release');
@@ -126,7 +127,7 @@ class OsFunctionsService
     {
         $content = file_get_contents($filename);
         if ($content === false) {
-            throw new \RuntimeException('Cannot read file ' . $filename);
+            throw new RuntimeException('Cannot read file ' . $filename);
         }
         return $content;
     }
@@ -167,7 +168,7 @@ class OsFunctionsService
     public function deployMessengerWorkerService(): bool
     {
         if (posix_getuid() === 0) {
-            throw new \RuntimeException('This method should not be run as root');
+            throw new RuntimeException('This method should not be run as root');
         }
 
         $username = posix_getpwuid(posix_getuid())['name'];
@@ -318,16 +319,16 @@ EOF;
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
-        return true;        
+        return true;
     }
 
     public function resetChmod(string $path, string $dirChmod = '0750', string $fileChmod = '0640'): bool
     {
         if (!preg_match('/^([0-7]{4})$/', $fileChmod)) {
-            throw new \InvalidArgumentException('Invalid file chmod');
+            throw new InvalidArgumentException('Invalid file chmod');
         }
         if (!preg_match('/^([0-7]{4})$/', $dirChmod)) {
-            throw new \InvalidArgumentException('Invalid directory chmod');
+            throw new InvalidArgumentException('Invalid directory chmod');
         }
 
         $process = new Process([$this->isSudoNeeded(), 'find', $path, '-type', 'f', '-exec', 'chmod', $fileChmod, '{}', ';']);

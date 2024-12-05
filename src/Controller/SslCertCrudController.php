@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\SslCert;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud};
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, BooleanField, IdField, TextField, TextareaField};
+use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, BooleanField, IdField, TextareaField, TextField};
 
 class SslCertCrudController extends AbstractCrudController
 {
@@ -19,8 +19,7 @@ class SslCertCrudController extends AbstractCrudController
         return $crud
             ->setSearchFields(['name'])
             ->setDefaultSort(['name' => 'ASC'])
-            ->setAutofocusSearch()
-        ;
+            ->setAutofocusSearch();
     }
 
     public function configureFields(string $pageName): iterable
@@ -44,7 +43,6 @@ class SslCertCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-        ;
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 }

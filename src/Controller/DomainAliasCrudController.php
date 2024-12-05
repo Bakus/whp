@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\DomainAlias;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud};
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{IdField, AssociationField, TextField, BooleanField};
+use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, BooleanField, IdField, TextField};
 
 class DomainAliasCrudController extends AbstractCrudController
 {
@@ -19,8 +19,7 @@ class DomainAliasCrudController extends AbstractCrudController
         return $crud
             ->setSearchFields(['domain_name'])
             ->setDefaultSort(['domain_name' => 'ASC'])
-            ->setAutofocusSearch()
-        ;
+            ->setAutofocusSearch();
     }
 
     public function configureFields(string $pageName): iterable
@@ -37,7 +36,6 @@ class DomainAliasCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-        ;
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 }

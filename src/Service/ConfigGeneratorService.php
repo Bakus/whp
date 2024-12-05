@@ -2,8 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\{Domain, HttpStrictTransportSecurity, IpAddress, Php, SslCert, User};
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\{Domain, IpAddress, User, HttpStrictTransportSecurity, SslCert, Php};
+use Exception;
 use Twig\Environment;
 
 class ConfigGeneratorService
@@ -18,10 +19,11 @@ class ConfigGeneratorService
 
     public function __construct(
         private EntityManagerInterface $em,
-        private Environment $twig,
-        private OsFunctionsService $osFunctions,
-        private DnsService $dnsService,
-    ) {
+        private Environment            $twig,
+        private OsFunctionsService     $osFunctions,
+        private DnsService             $dnsService,
+    )
+    {
     }
 
     public function setCreateMtastsIfNeeded(bool $createMtastsIfNeeded): void
@@ -170,7 +172,7 @@ class ConfigGeneratorService
                 // domain mta-sts declared - do not create mta-sts virtualhost
                 $mx = false;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $mx = false;
         }
         if ($mx) {

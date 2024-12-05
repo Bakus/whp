@@ -2,19 +2,18 @@
 
 namespace App\MessageHandler;
 
+use App\Entity\{User};
 use App\Message\ChmodReset;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\{Domain, User};
-
 use App\Service\OsFunctionsService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class ChmodResetHandler
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService $osFunctions,
+        private OsFunctionsService     $osFunctions,
     )
     {
     }
@@ -28,8 +27,7 @@ class ChmodResetHandler
             ->getRepository(User::class)
             ->findOneBy([
                 'username' => $chmodReset->getUsername()
-            ])
-        ;
+            ]);
 
         $homeDir = $user->getHomeDir();
         $this->osFunctions->resetChmod($homeDir);

@@ -2,19 +2,18 @@
 
 namespace App\MessageHandler;
 
-use App\Message\ChownReset;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
-
+use App\Message\ChownReset;
 use App\Service\OsFunctionsService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class ChownResetHandler
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService $osFunctions,
+        private OsFunctionsService     $osFunctions,
     )
     {
     }
@@ -28,8 +27,7 @@ class ChownResetHandler
             ->getRepository(User::class)
             ->findOneBy([
                 'username' => $chownReset->getUsername()
-            ])
-        ;
+            ]);
         $this->osFunctions->resetChown($user->getHomeDir(), $user->getUsername());
 
         $domain = $user->getDomains();

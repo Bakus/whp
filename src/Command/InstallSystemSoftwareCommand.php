@@ -3,14 +3,15 @@
 namespace App\Command;
 
 use App\Service\OsFunctionsService;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Process\Process;
 
 #[AsCommand(
     name: 'app:install-system-software',
@@ -77,7 +78,7 @@ class InstallSystemSoftwareCommand extends Command
                 if (strpos($output, 'https://ppa.launchpadcontent.net/ondrej/php/ubuntu/') === false) {
                     $this->runProcess('add-apt-repository', 'ppa:ondrej/php');
                     $this->io->writeln('Repository added');
-                }else{
+                } else {
                     $this->io->writeln('Repository already added');
                 }
                 break;
@@ -141,12 +142,12 @@ class InstallSystemSoftwareCommand extends Command
             $this->runProcess('a2enmod', 'headers');
         }
 
-        if(!$this->osFunctions->checkPackageIsInstalled('cloudflared')) {
+        if (!$this->osFunctions->checkPackageIsInstalled('cloudflared')) {
             $toInstall = $this->io->choice('Install cloudflared?', ['y', 'n'], multiSelect: false);
             if ($toInstall === 'y') {
                 $this->installCloudflared();
             }
-        }else{
+        } else {
             $this->io->writeln('cloudflared is already installed');
         }
 
@@ -166,12 +167,12 @@ class InstallSystemSoftwareCommand extends Command
         $process = new Process($toRun);
         $process->run();
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException('Failed to run command: ' . implode(' ', $toRun));
+            throw new RuntimeException('Failed to run command: ' . implode(' ', $toRun));
         }
         return $process;
     }
 
-    protected function installPhp(string $version) : bool
+    protected function installPhp(string $version): bool
     {
         $packages = [
             "php$version-bcmath",
@@ -236,7 +237,7 @@ class InstallSystemSoftwareCommand extends Command
 
         $statusCode = $response->getStatusCode();
         if ($statusCode != 200) {
-            throw new \RuntimeException('Failed to download file');
+            throw new RuntimeException('Failed to download file');
         }
         $content = $response->getContent();
 

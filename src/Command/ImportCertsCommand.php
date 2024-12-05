@@ -3,13 +3,13 @@
 namespace App\Command;
 
 use App\Entity\SslCert;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
@@ -19,7 +19,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class ImportCertsCommand extends Command
 {
     public function __construct(
-        protected EntityManagerInterface $entityManager,
+        protected EntityManagerInterface      $entityManager,
         protected UserPasswordHasherInterface $userPasswordHasher
     )
     {
@@ -29,8 +29,7 @@ class ImportCertsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('certs-direrctory', InputArgument::REQUIRED, 'Path to the directory containing the certificates.')
-        ;
+            ->addArgument('certs-direrctory', InputArgument::REQUIRED, 'Path to the directory containing the certificates.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

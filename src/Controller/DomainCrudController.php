@@ -3,14 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Domain;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{IdField, CodeEditorField, TextField, AssociationField, BooleanField, ChoiceField};
+use App\Entity\HttpStrictTransportSecurity;
+use App\Service\OsFunctionsService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use App\Entity\HttpStrictTransportSecurity;
-
-use App\Service\OsFunctionsService;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField,
+    BooleanField,
+    ChoiceField,
+    CodeEditorField,
+    IdField,
+    TextField};
 
 class DomainCrudController extends AbstractCrudController
 {
@@ -24,8 +28,7 @@ class DomainCrudController extends AbstractCrudController
         return $crud
             ->setSearchFields(['fqdn'])
             ->setDefaultSort(['fqdn' => 'ASC'])
-            ->setAutofocusSearch()
-        ;
+            ->setAutofocusSearch();
     }
 
     public function configureFields(string $pageName): iterable
@@ -62,7 +65,7 @@ class DomainCrudController extends AbstractCrudController
             BooleanField::new('haveGenerateMtaSts', 'MTA-STS generated')
                 ->setHelp('MTA-STS vhost is generated for this domain.')
                 ->hideOnForm()
-                ->setFormTypeOption('disabled','disabled'),
+                ->setFormTypeOption('disabled', 'disabled'),
             BooleanField::new('is_active'),
             AssociationField::new('domainAliases', 'Aliases')
                 ->onlyOnDetail(),
@@ -72,7 +75,6 @@ class DomainCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-        ;
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 }
