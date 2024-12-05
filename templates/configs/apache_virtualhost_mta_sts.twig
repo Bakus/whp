@@ -1,0 +1,19 @@
+<VirtualHost {% if ':' in ip.ipAddress %}[{{ ip }}]{% else %}{{ ip }}{% endif %}:443>
+    ServerName {{ domain }}
+    ServerAlias {{ aliases | join(' ') }}
+
+    CustomLog "|/usr/bin/rotatelogs -lD /var/log/apache2/vhosts/{{ domain }}/%Y/%Y-%m-%d_access.log 86400" vhost_combined
+    ErrorLog "|/usr/bin/rotatelogs -lD /var/log/apache2/vhosts/{{ domain }}/%Y/%Y-%m-%d_error.log 86400"
+
+    ServerAdmin support@idn.net.pl
+    DocumentRoot "{{ webroot }}"
+
+    SSLEngine on
+    SSLCertificateFile {{ SslCert.CrtFile }}
+    SSLCertificateKeyFile {{ SslCert.KeyFile }}
+    SSLCACertificateFile {{ SslCert.CaFile }}
+
+    AssignUserId panel panel
+
+    {{ hsts | raw }}
+</VirtualHost>

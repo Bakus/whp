@@ -1,0 +1,31 @@
+[{{ data.owner.username }}]
+
+user = {{ data.owner.username }}
+group = {{ data.owner.username }}
+listen = /run/php/php{{ data.phpVersion }}-fpm-{{ data.owner.username }}.sock
+
+listen.owner = {{ data.owner.username }}
+listen.group = {{ data.owner.username }}
+listen.mode = 0660
+
+pm = dynamic
+pm.max_children = {{ config.maxChildren ?? '10' }}
+pm.start_servers = {{ config.startServers ?? '3' }}
+pm.min_spare_servers = {{ config.minSpare ?? '1' }}
+pm.max_spare_servers = {{ config.maxSpare ?? '4' }}
+
+chdir = {{ data.owner.homeDir }}
+
+;slowlog = {{ config.slowLog ?? 'log/$pool.log.slow' }}
+;php_flag[display_errors] = off
+{% if config.errorLog is null %}
+php_admin_value[error_log] = /var/log/fpm-php{{ data.phpVersion }}-{{ data.owner.username }}.log
+{% else %}
+php_admin_value[error_log] = {{ config.errorLog }}
+{% endif %}
+php_admin_flag[log_errors] = on
+
+php_admin_value[post_max_size] = {{ config.uploadSize ?? '2' }}M
+php_admin_value[upload_max_filesize] = {{ config.uploadSize ?? '2' }}M
+
+{{ data.owner.phpFpmConfigExtra }}

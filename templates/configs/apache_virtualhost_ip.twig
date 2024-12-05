@@ -1,0 +1,48 @@
+Listen {% if ':' in ip.ipAddress %}[{{ ip.ipAddress }}]{% else %}{{ ip.ipAddress }}{% endif %}:80
+
+<VirtualHost {% if ':' in ip.ipAddress %}[{{ ip.ipAddress }}]{% else %}{{ ip.ipAddress }}{% endif %}:80>
+    ServerName {{ ip.ipAddress }}
+
+    CustomLog "|/usr/bin/rotatelogs -lD /var/log/apache2/vhosts/{{ ip.ipAddress }}/%Y/%Y-%m-%d_access.log 86400" vhost_combined
+    ErrorLog "|/usr/bin/rotatelogs -lD /var/log/apache2/vhosts/{{ ip.ipAddress }}/%Y/%Y-%m-%d_error.log 86400"
+
+    ServerAdmin support@idn.net.pl
+    DocumentRoot "{{ webroot }}"
+
+{% if ip.SslCert.CrtFile is defined %}
+    RewriteEngine On
+    RewriteRule ^/(.*) https://%{HTTP_HOST}/$1
+{% else %}
+    <FilesMatch \.php$>
+        SetHandler "proxy:unix:/run/php/php{{ ip.phpVersion }}-fpm-{{ ip.owner.username }}.sock|fcgi://localhost"
+    </FilesMatch>
+{% endif %}
+
+    AssignUserId {{ ip.owner.username }} {{ ip.owner.username }}
+</VirtualHost>
+
+{% if ip.SslCert.CrtFile is defined %}
+Listen {% if ':' in ip.ipAddress %}[{{ ip.ipAddress }}]{% else %}{{ ip.ipAddress }}{% endif %}:443
+
+<VirtualHost {% if ':' in ip.ipAddress %}[{{ ip.ipAddress }}]{% else %}{{ ip.ipAddress }}{% endif %}:443>
+    ServerName {{ ip.ipAddress }}
+
+    CustomLog "|/usr/bin/rotatelogs -lD /var/log/apache2/vhosts/{{ ip.ipAddress }}/%Y/%Y-%m-%d_access.log 86400" vhost_combined
+    ErrorLog "|/usr/bin/rotatelogs -lD /var/log/apache2/vhosts/{{ ip.ipAddress }}/%Y/%Y-%m-%d_error.log 86400"
+
+    ServerAdmin support@idn.net.pl
+    DocumentRoot "{{ webroot }}"
+
+    <FilesMatch \.php$>
+        SSLOptions +StdEnvVars
+        SetHandler "proxy:unix:/run/php/php{{ ip.phpVersion }}-fpm-{{ ip.owner.username }}.sock|fcgi://localhost"
+    </FilesMatch>
+
+    SSLEngine on
+    SSLCertificateFile {{ ip.SslCert.CrtFile }}
+    SSLCertificateKeyFile {{ ip.SslCert.KeyFile }}
+    SSLCACertificateFile {{ ip.SslCert.CaFile }}
+
+    AssignUserId {{ ip.owner.username }} {{ ip.owner.username }}
+</VirtualHost>
+{% endif %}

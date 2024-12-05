@@ -1,0 +1,31 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block main %}
+            <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Content</th>
+                    <th>Install status</th>
+                </tr>
+            </thead>
+            <tbody>
+{% for filename, result in results %}
+                <tr>
+                    <td>{{ filename }}</td>
+                    <td>
+                        <pre>{{ result.content }}</pre>
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ result.status == 'success' ? 'success' : 'danger' }}">
+                            {{ result.status == 'success' ? 'OK' : 'ERROR' }}
+                        </span>
+                        {% if result.status == 'error' %}
+                            <pre>{{ result.message }}</pre>
+                        {% endif %}
+                    </td>
+                </tr>
+{% endfor %}
+            </tbody>
+        </table>
+{% endblock main %}

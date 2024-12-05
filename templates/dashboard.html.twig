@@ -1,0 +1,123 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block main %}
+    <h1 class="page-title">Services status</h1>
+    <table class="datagrid">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Enabled</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service, data in servicesStatus %}
+                <tr>
+                    <td>
+                        {{ service | replace({'.service': ''}) }}
+                    </td>
+                    <td>
+                        <span class="badge badge-{% if data.enabled == "enabled" %}success{% else %}danger{% endif %}">
+                            {{ data.enabled }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-{% if data.active == "active" %}success{% elseif data.active == "inactive" %}warning{% elseif data.active == "failed" %}danger{% else %}secondary{% endif %}">
+                            {{ data.active }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ ea_url().setRoute('restartService', {'service': service} ) }}" title="Restart"><span class="fa-fw fas fa-rotate"></span></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1 class="page-title">Configuration files</h1>
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Actions
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ ea_url().setRoute('regenerateConfigs') }}" class="dropdown-item">Regenerate configuration files</a></li>
+            <li><a href="{{ ea_url().setRoute('downloadAllConfigFiles') }}" class="dropdown-item">Download all configuration files</a></li>
+            <li><a href="#checkAllConfigFiles" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#askModal">Check all config files</a></li>
+        </ul>
+    </div>
+    <table class="datagrid">
+        <thead>
+            <tr>
+                <th>File</th>
+                <th>Size</th>
+                <th>Last mod time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file, data in configFiles %}
+                <tr>
+                    <td>
+                        {{ file }}
+                    </td>
+                    <td>
+                        {{ data.size | ea_filesize }}
+                    </td>
+                    <td>
+                        {{ data.mtime | date('Y-m-d H:i:s') }}
+                    </td>
+                    <td>
+                        {% if data.status == "ok" %}
+                            <span class="badge badge-success">ok</span>
+                        {% elseif data.status == "outdated" %}
+                            <span class="badge badge-warning">outdated</span>
+                        {% elseif data.status == "missing" %}
+                            <span class="badge badge-danger">missing</span>
+                        {% elseif data.status == "for-deletion" %}
+                            <span class="badge badge-danger">for deletion</span>
+                        {% else %}
+                            <span class="badge badge-secondary">unknown</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ ea_url().setRoute('downloadConfigFile', {'file': file} ) }}" title="Download"><span class="fa-fw fas fa-download"></span></a>
+                        {% if diffs_enabled and data.diff != '' %}
+                            <a href="#" title="Show DIFF" onclick="showDiff('diff{{ file | replace({'/': '_', '.': '_'}) }}'); return false;"><span class="fa-fw fas fa-code-compare"></span></a>
+                            <div class="d-none" id="diff{{ file | replace({'/': '_', '.': '_'}) }}">{{ data.diff | raw }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="modal fade" id="askModal" tabindex="-1" aria-labelledby="askModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    This will generate new configuration files and compare them with the existing ones.
+                    This will take some time. Are you sure?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a type="button" class="btn btn-primary" href="{{ ea_url().setRoute('checkAllConfigFiles') }}">OK</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="diffModal" tabindex="-1" aria-labelledby="diffModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body" id="diffModalContent">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock main %}
+
+{% block javascripts %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+{% endblock %}
