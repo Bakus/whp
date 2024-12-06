@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Php;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, CodeEditorField, TextField, ChoiceField, IntegerField};
-use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud};
 use App\Service\OsFunctionsService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud};
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, ChoiceField, CodeEditorField, IntegerField, TextField};
 
 class PhpCrudController extends AbstractCrudController
 {
@@ -59,7 +59,6 @@ class PhpCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-        ;
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 }

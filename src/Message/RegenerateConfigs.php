@@ -4,7 +4,7 @@ namespace App\Message;
 
 class RegenerateConfigs
 {
-    public function __construct(
-    ) {
+    public function __construct()
+    {
     }
 }

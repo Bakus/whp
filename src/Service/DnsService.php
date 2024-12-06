@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use Exception;
+use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
 
 class DnsService
@@ -10,7 +12,7 @@ class DnsService
     {
         try {
             $result = $this->checkMtaSts($domain);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
         if ($result) {
@@ -60,7 +62,7 @@ class DnsService
     public function queryDns(string $domain, string $recordType): array
     {
         if (!in_array($recordType, ['A', 'AAAA', 'MX', 'CNAME', 'TXT', 'NS', 'SOA', 'SRV', 'PTR', 'DNSKEY', 'DS', 'NSEC', 'RRSIG', 'NSEC3', 'NSEC3PARAM', 'TLSA', 'SMIMEA', 'CAA', 'URI', 'SSHFP', 'OPENPGPKEY', 'CDS', 'CDNSKEY', 'CSYNC', 'DS', 'DLV'])) {
-            throw new \RuntimeException('Invalid record type');
+            throw new RuntimeException('Invalid record type');
         }
 
         $url = 'https://cloudflare-dns.com/dns-query?name=' . $domain . '&type=' . $recordType;
@@ -74,12 +76,12 @@ class DnsService
         $response = $client->request('GET', $url);
         $statusCode = $response->getStatusCode();
         if ($statusCode != 200) {
-            throw new \RuntimeException('Failed to query DNS');
+            throw new RuntimeException('Failed to query DNS');
         }
         $content = $response->getContent();
         $json = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         if (!isset($json['Answer'])) {
-            throw new \RuntimeException('No records found for ' . $recordType . ' in ' . $domain);
+            throw new RuntimeException('No records found for ' . $recordType . ' in ' . $domain);
         }
         return $json['Answer'];
     }

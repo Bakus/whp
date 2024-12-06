@@ -4,12 +4,13 @@ namespace App\Command;
 
 use App\Service\{ConfigGeneratorService, OsFunctionsService};
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 #[AsCommand(
     name: 'app:make-config-files',
@@ -20,7 +21,7 @@ class MakeConfigFilesCommand extends Command
     public function __construct(
         private ConfigGeneratorService $configGenerator,
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService $osFunctions,
+        private OsFunctionsService     $osFunctions,
     )
     {
         parent::__construct();
@@ -43,7 +44,7 @@ class MakeConfigFilesCommand extends Command
         ];
         try {
             $this->osFunctions->clearConfigs();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $results['Clear old configs']['status'] = 'error';
             $results['Clear old configs']['message'] = $e->getMessage();
         }
@@ -56,7 +57,7 @@ class MakeConfigFilesCommand extends Command
 
             try {
                 $this->osFunctions->writeConfig($file, $content);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $results[$file]['status'] = 'error';
                 $results[$file]['message'] = $e->getMessage();
             }

@@ -2,14 +2,15 @@
 
 namespace App\Command;
 
+use App\Entity\User;
+use App\Service\OsFunctionsService;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\User;
-use App\Service\OsFunctionsService;
 
 #[AsCommand(
     name: 'app:deploy-system-users',
@@ -19,7 +20,7 @@ class DeploySystemUsersCommand extends Command
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,
-        protected OsFunctionsService $osFunctions,
+        protected OsFunctionsService     $osFunctions,
     )
     {
         parent::__construct();
@@ -58,7 +59,7 @@ class DeploySystemUsersCommand extends Command
         foreach ($usersToCreate as $user) {
             try {
                 $this->osFunctions->createSystemUser($user->getUsername(), $user->getUid(), $user->getHomeDir());
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $io->error('Error creating user ' . $user->getUsername() . ': ' . $e->getMessage());
                 return Command::FAILURE;
             }

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(
     name: 'version_user_idx',
     columns: ['version', 'user_id']
-  )]
+)]
 class Php
 {
     #[ORM\Id]

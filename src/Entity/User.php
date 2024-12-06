@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -59,10 +60,10 @@ class User
     private int $FtpLoginCount = 0;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $FtpLastLogin = null;
+    private ?DateTimeInterface $FtpLastLogin = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $FtpLastModified = null;
+    private ?DateTimeInterface $FtpLastModified = null;
 
     /**
      * @var Collection<int, Php>
@@ -286,24 +287,24 @@ class User
         return $this;
     }
 
-    public function getFtpLastLogin(): ?\DateTimeInterface
+    public function getFtpLastLogin(): ?DateTimeInterface
     {
         return $this->FtpLastLogin;
     }
 
-    public function setFtpLastLogin(?\DateTimeInterface $FtpLastLogin): static
+    public function setFtpLastLogin(?DateTimeInterface $FtpLastLogin): static
     {
         $this->FtpLastLogin = $FtpLastLogin;
 
         return $this;
     }
 
-    public function getFtpLastModified(): ?\DateTimeInterface
+    public function getFtpLastModified(): ?DateTimeInterface
     {
         return $this->FtpLastModified;
     }
 
-    public function setFtpLastModified(?\DateTimeInterface $FtpLastModified): static
+    public function setFtpLastModified(?DateTimeInterface $FtpLastModified): static
     {
         $this->FtpLastModified = $FtpLastModified;
 

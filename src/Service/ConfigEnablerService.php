@@ -2,9 +2,8 @@
 
 namespace App\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\{Domain, IpAddress};
-
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -23,7 +22,7 @@ class ConfigEnablerService
                 $filesystem->remove(
                     '/etc/apache2/sites-enabled/' . $ip->getSafeIpAddress() . '.conf',
                 );
-            }else{
+            } else {
                 try {
                     $filesystem->symlink(
                         '/etc/apache2/sites-available/' . $ip->getSafeIpAddress() . '.conf',

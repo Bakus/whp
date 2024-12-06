@@ -5,18 +5,22 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Message\ChmodReset;
 use App\Message\ChownReset;
-
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud, KeyValueStore};
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField, BooleanField, IdField, TextField, IntegerField, CodeEditorField, DateTimeField};
+use EasyCorp\Bundle\EasyAdminBundle\Field\{AssociationField,
+    BooleanField,
+    CodeEditorField,
+    DateTimeField,
+    IdField,
+    IntegerField,
+    TextField};
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-
 use Symfony\Component\Form\{FormBuilderInterface, FormEvents};
 use Symfony\Component\Form\Extension\Core\Type\{PasswordType, RepeatedType};
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -30,8 +34,7 @@ class UserCrudController extends AbstractCrudController
         return $crud
             ->setSearchFields(['username'])
             ->setDefaultSort(['username' => 'ASC'])
-            ->setAutofocusSearch()
-        ;
+            ->setAutofocusSearch();
     }
 
     public function configureFields(string $pageName): iterable
@@ -76,8 +79,7 @@ class UserCrudController extends AbstractCrudController
             // ->add(Crud::PAGE_INDEX, Action::new('resetChown', 'Reset CHOWN')->linkToCrudAction('resetChown'))
             ->add(Crud::PAGE_DETAIL, Action::new('resetChmod', 'Reset CHMOD', 'fa fa-user-lock')->linkToCrudAction('resetChmod'))
             ->add(Crud::PAGE_DETAIL, Action::new('resetChown', 'Reset CHOWN', 'fa fa-solid fa-people-arrows')->linkToCrudAction('resetChown'))
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
-        ;
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
@@ -91,13 +93,15 @@ class UserCrudController extends AbstractCrudController
         $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);
         return $this->addPasswordEventListener($formBuilder);
     }
+
     private function addPasswordEventListener(FormBuilderInterface $formBuilder): FormBuilderInterface
     {
         return $formBuilder->addEventListener(FormEvents::POST_SUBMIT, $this->hashPassword());
     }
 
-    private function hashPassword() {
-        return function($event) {
+    private function hashPassword()
+    {
+        return function ($event) {
             $form = $event->getForm();
             if (!$form->isValid()) {
                 return;
@@ -107,7 +111,7 @@ class UserCrudController extends AbstractCrudController
                 return;
             }
 
-            $hash = "{md5}".base64_encode( pack( "H*", md5( $password ) ) );
+            $hash = "{md5}" . base64_encode(pack("H*", md5($password)));
             $form->getData()->setPassword($hash);
         };
     }
@@ -122,8 +126,7 @@ class UserCrudController extends AbstractCrudController
         $url = $routeBuilder->setController(UserCrudController::class)
             ->setAction(Action::DETAIL)
             ->setEntityId($user->getId())
-            ->generateUrl()
-        ;
+            ->generateUrl();
 
         return $this->redirect($url);
     }
@@ -138,8 +141,7 @@ class UserCrudController extends AbstractCrudController
         $url = $routeBuilder->setController(UserCrudController::class)
             ->setAction(Action::DETAIL)
             ->setEntityId($user->getId())
-            ->generateUrl()
-        ;
+            ->generateUrl();
 
         return $this->redirect($url);
     }
