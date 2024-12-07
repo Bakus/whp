@@ -21,9 +21,8 @@ class MakeConfigFilesCommand extends Command
     public function __construct(
         private ConfigGeneratorService $configGenerator,
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService     $osFunctions,
-    )
-    {
+        private OsFunctionsService $osFunctions,
+    ) {
         parent::__construct();
     }
 

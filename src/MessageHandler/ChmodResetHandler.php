@@ -13,9 +13,8 @@ class ChmodResetHandler
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService     $osFunctions,
-    )
-    {
+        private OsFunctionsService $osFunctions,
+    ) {
     }
 
     public function __invoke(ChmodReset $chmodReset)

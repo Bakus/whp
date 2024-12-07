@@ -19,11 +19,10 @@ class ConfigGeneratorService
 
     public function __construct(
         private EntityManagerInterface $em,
-        private Environment            $twig,
-        private OsFunctionsService     $osFunctions,
-        private DnsService             $dnsService,
-    )
-    {
+        private Environment $twig,
+        private OsFunctionsService $osFunctions,
+        private DnsService $dnsService,
+    ) {
     }
 
     public function setCreateMtastsIfNeeded(bool $createMtastsIfNeeded): void

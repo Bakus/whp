@@ -20,9 +20,8 @@ class DeploySystemUsersCommand extends Command
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,
-        protected OsFunctionsService     $osFunctions,
-    )
-    {
+        protected OsFunctionsService $osFunctions,
+    ) {
         parent::__construct();
     }
 

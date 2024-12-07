@@ -6,8 +6,7 @@ class ServiceRestart
 {
     public function __construct(
         private string $serviceName,
-    )
-    {
+    ) {
     }
 
     public function getServiceName(): string

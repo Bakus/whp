@@ -19,10 +19,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class ImportCertsCommand extends Command
 {
     public function __construct(
-        protected EntityManagerInterface      $entityManager,
+        protected EntityManagerInterface $entityManager,
         protected UserPasswordHasherInterface $userPasswordHasher
-    )
-    {
+    ) {
         parent::__construct();
     }
 

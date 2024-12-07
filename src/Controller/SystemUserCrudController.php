@@ -16,8 +16,7 @@ class SystemUserCrudController extends AbstractCrudController
 {
     public function __construct(
         protected UserPasswordHasherInterface $userPasswordHasher
-    )
-    {
+    ) {
     }
 
     public static function getEntityFqcn(): string

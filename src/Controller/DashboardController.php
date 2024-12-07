@@ -19,8 +19,7 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private RequestStack $requestStack,
-    )
-    {
+    ) {
     }
 
     #[Route('/', name: 'admin_dashboard')]

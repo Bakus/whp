@@ -18,9 +18,8 @@ class StatusCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService     $osFunctions,
-    )
-    {
+        private OsFunctionsService $osFunctions,
+    ) {
         parent::__construct();
     }
 

@@ -23,8 +23,7 @@ class InstallSystemSoftwareCommand extends Command
 
     public function __construct(
         protected OsFunctionsService $osFunctions
-    )
-    {
+    ) {
         parent::__construct();
 
         // If not Debian or Ubuntu - throw an exception

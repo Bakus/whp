@@ -10,17 +10,15 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\TexterInterface;
 
-
 #[AsMessageHandler]
 class RegenerateConfigsHandler
 {
     public function __construct(
         private ConfigGeneratorService $configGenerator,
         private EntityManagerInterface $entityManager,
-        private OsFunctionsService     $osFunctions,
-        private TexterInterface        $texter,
-    )
-    {
+        private OsFunctionsService $osFunctions,
+        private TexterInterface $texter,
+    ) {
     }
 
     public function __invoke(RegenerateConfigs $regenerateConfigs): void
