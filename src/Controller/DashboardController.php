@@ -77,6 +77,7 @@ class DashboardController extends AbstractDashboardController
                 'mtime' => $configFiles[$file]['mtime'] ?? null,
                 'status' => $status,
                 'diff' => ($status == 'outdated') ? DiffHelper::calculate($existing, $rendered, $rendererName, $differOptions) : "",
+                'rendered' => ($status == 'missing') ? $rendered : "",
             ];
         }
 
@@ -123,6 +124,29 @@ class DashboardController extends AbstractDashboardController
         $fileContent = $osFunctions->readConfig($file);
 
         $response = new Response($fileContent);
+        $response->headers->set('Content-Type', 'text/plain');
+
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            basename($file)
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
+    }
+
+    #[Route('/downloadConfigFileGenerated', name: 'downloadConfigFileGenerated')]
+    public function downloadConfigFileGenerated($file): Response
+    {
+        $session = $this->requestStack->getSession();
+        $configFiles = $session->get('configFiles', []);
+
+        if (!array_key_exists($file, $configFiles)) {
+            $this->addFlash('error', 'File not managed!');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
+        $response = new Response($configFiles[$file]['rendered']);
         $response->headers->set('Content-Type', 'text/plain');
 
         $disposition = HeaderUtils::makeDisposition(
