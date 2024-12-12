@@ -11,7 +11,7 @@ It supports multiple:
 
 With console commands, it helps to configure repositories and install packages.
 
-In addition, the database is tuned to support virtual accounts via [ProFTPd](http://www.proftpd.org/) (but manual configuration of ProFTPd is required) - to be improved in the future…
+In addition, the database is tuned to support virtual accounts via [ProFTPd](http://www.proftpd.org/) - to be improved in the future…
 
 ## Installation
 Minimal required PHP version for start is 8.2 - this can be installed from system repository.
@@ -68,58 +68,10 @@ This comman will install:
 
 ## ProFTPd configuration
 > [!NOTE]
-> It is likely that ProFTPd may be replaced by another server in the future.
+> Small manual configuration have to be done!
 
-In addition, to make ProFTPd working - create file `/etc/proftpd/conf.d/whp.conf` with content:
+In file `/etc/proftpd/proftpd.conf` please confirm that:
 ```
-LoadModule mod_tls.c
-LoadModule mod_sql.c
-LoadModule mod_sql_mysql.c
-LoadModule mod_sql_passwd.c
-LoadModule mod_sftp.c
-LoadModule mod_sftp_sql.c
-
-DefaultRoot ~
-Umask 027 027
-
-UseLastlog                      on
-
-<IfModule mod_delay.c>
-    DelayEngine                 on
-</IfModule>
-
-<IfModule mod_tls.c>
-    TLSEngine                   on
-    TLSLog                      /var/log/proftpd/tls.log
-    TLSProtocol                 TLSv1.2 TLSv1.3
-    TLSRequired                 off
-    TLSRSACertificateFile       /etc/ssl/example.com.crt
-    TLSRSACertificateKeyFile    /etc/ssl/example.com.key
-    TLSCACertificateFile        /etc/ssl/example.com.ca
-    TLSVerifyClient             off
-    TLSRenegotiate              none
-    TLSOptions                  NoSessionReuseRequired
-</IfModule>
-
-<IfModule mod_sql.c>
-    SQLBackend                  mysql
-    SQLEngine                   on
-    SQLAuthenticate             users
-    SQLAuthTypes                OpenSSL
-    SQLConnectInfo              database@host dbuser dbpassword
-    SQLUserInfo                 user username password uid uid home_dir NULL
-    SQLUserWhereClause          "is_active = 1"
-
-    SQLMinID                    1000
-    CreateHome                  on
-    RequireValidShell           off
-
-    # Update count every time user logs in
-    SQLLog                      PASS updatecount
-    SQLNamedQuery               updatecount UPDATE "ftp_login_count=ftp_login_count+1, ftp_last_login=now() WHERE username='%u' LIMIT 1" user
-
-    # Update modified everytime user uploads or deletes a file
-    SQLLog                      STOR,DELE modified
-    SQLNamedQuery               modified UPDATE "ftp_last_modified=now() WHERE username='%u' LIMIT 1" user
-</IfModule>
+DefaultServer off
+Port 0
 ```

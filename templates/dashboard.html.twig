@@ -68,6 +68,11 @@
                         {{ data.mtime | date('Y-m-d H:i:s') }}
                     </td>
                     <td>
+                        {% if data.sensitive %}
+                            <i class="fa-solid fa-lock text-danger" title="File containing sensitive data. Downloading is disabled for non super admin users."></i>
+                        {% else %}
+                            <i class="fa-solid fa-lock-open text-success" title="File does not contain sensitive data."></i>
+                        {% endif %}
                         {% if data.status == "ok" %}
                             <span class="badge badge-success">ok</span>
                         {% elseif data.status == "outdated" %}

@@ -78,7 +78,13 @@ class DashboardController extends AbstractDashboardController
                 'status' => $status,
                 'diff' => ($status == 'outdated') ? DiffHelper::calculate($existing, $rendered, $rendererName, $differOptions) : "",
                 'rendered' => ($status == 'missing') ? $rendered : "",
+                'sensitive' => $osFunctions->isConfigSensitive($file),
             ];
+
+            if ($allFiles[$file]['sensitive'] && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+                $allFiles[$file]['diff'] = '';
+                $allFiles[$file]['rendered'] = '';
+            }
         }
 
         $session = $this->requestStack->getSession();
@@ -121,6 +127,11 @@ class DashboardController extends AbstractDashboardController
             return $this->redirectToRoute('admin_dashboard');
         }
 
+        if ($osFunctions->isConfigSensitive($file) && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'This file is marked as sensitive and can be downloaded only by superadmin!');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
         $fileContent = $osFunctions->readConfig($file);
 
         $response = new Response($fileContent);
@@ -143,6 +154,11 @@ class DashboardController extends AbstractDashboardController
 
         if (!array_key_exists($file, $configFiles)) {
             $this->addFlash('error', 'File not managed!');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
+        if ($configFiles[$file]['sensitive'] === true && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('error', 'This file is marked as sensitive and can be downloaded only by superadmin!');
             return $this->redirectToRoute('admin_dashboard');
         }
 

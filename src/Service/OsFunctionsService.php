@@ -14,6 +14,11 @@ class OsFunctionsService
     protected array $configPlaces = [
         '/etc/apache2/sites-enabled/*',
         '/etc/apache2/conf-enabled/000_dirs.conf',
+        '/etc/proftpd/conf.d/*',
+    ];
+
+    protected array $sensitiveFiles = [
+        '/etc/proftpd/conf.d/00_whp.conf'
     ];
 
     public function __construct()
@@ -163,6 +168,11 @@ class OsFunctionsService
             }
         }
         return true;
+    }
+
+    public function isConfigSensitive(string $filename): bool
+    {
+        return in_array($filename, $this->sensitiveFiles);
     }
 
     public function deployMessengerWorkerService(): bool

@@ -42,6 +42,18 @@ class ConfigGeneratorService
             '/home/panel/mta-sts/' => '/home/panel/mta-sts/',
         ];
 
+        /**
+         * @todo Check if options are disabled in /etc/proftpd/proftpd.conf:
+         * Port 21D
+         * efaultServer on
+         */
+        $this->files['/etc/proftpd/conf.d/00_whp.conf'] = $this->twig->render('configs/proftpd_main.twig', [
+            'dbname' => $_ENV['PROFTPD_DBNAME'],
+            'dbhost' => $_ENV['PROFTPD_DBHOST'],
+            'dbuser' => $_ENV['PROFTPD_DBUSER'],
+            'dbpass' => $_ENV['PROFTPD_DBPASS'],
+        ]);
+
         $repository = $this->em->getRepository(IpAddress::class);
         $ipAddresses = $repository->findBy(
             ['is_active' => true],
@@ -51,8 +63,11 @@ class ConfigGeneratorService
                 continue;
             }
             $webroot = OsFunctionsService::prettifyDirPath($ip->getWebroot() . '/');
-
             $webroots[$webroot] = $webroot;
+
+            $this->files['/etc/proftpd/conf.d/50_' . $ip->getSafeIpAddress() . '.conf'] = $this->twig->render('configs/proftpd_ip.twig', [
+                'ip' => $ip,
+            ]);
             $this->files['/etc/apache2/sites-enabled/' . $ip->getSafeIpAddress() . '.conf'] = $this->twig->render('configs/apache_virtualhost_ip.twig', [
                 'ip' => $ip,
                 'webroot' => $webroot,
