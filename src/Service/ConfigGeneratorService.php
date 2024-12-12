@@ -44,8 +44,8 @@ class ConfigGeneratorService
 
         /**
          * @todo Check if options are disabled in /etc/proftpd/proftpd.conf:
-         * Port 21D
-         * efaultServer on
+         * Port 21
+         * DefaultServer on
          */
         $this->files['/etc/proftpd/conf.d/00_whp.conf'] = $this->twig->render('configs/proftpd_main.twig', [
             'dbname' => $_ENV['PROFTPD_DBNAME'],
