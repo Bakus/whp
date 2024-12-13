@@ -150,6 +150,8 @@ class InstallSystemSoftwareCommand extends Command
             $this->io->writeln('cloudflared is already installed');
         }
 
+        $this->checkProftpdConfiguration();
+
         $toInstall = $this->io->choice('Deploy and enable messenger-worker.service?', ['y', 'n'], multiSelect: false);
         if ($toInstall === 'y') {
             $this->osFunctions->deployMessengerWorkerService();
@@ -206,6 +208,28 @@ class InstallSystemSoftwareCommand extends Command
             $this->io->writeln(' done');
         }
         return true;
+    }
+
+    protected function checkProftpdConfiguration(): void
+    {
+        $port = $this->osFunctions->getValueFromConfig('proftpd.conf', 'Port');
+        $defaultServer = $this->osFunctions->getValueFromConfig('proftpd.conf', 'DefaultServer');
+        if (
+            !($port === false || $port[0] == 0)
+            ||
+            !($defaultServer === false || strtolower($defaultServer[0]) == 'off')
+        ) {
+            $portInfo = ($port !== false) ? $port[0] : "not found or commented out";
+            $defaultServerInfo = is_array($defaultServer) ? $defaultServer[0] : "not found or commented out";
+            $this->io->info("ProFTPd is not configured properly. Fixing...");
+            if (isset($portInfo)) {
+                $this->osFunctions->setValueInConfig('proftpd.conf', 'Port', ['0']);
+            }
+            if (isset($defaultServerInfo)) {
+                $this->osFunctions->setValueInConfig('proftpd.conf', 'DefaultServer', ['off']);
+            }
+            $this->io->success('ProFTPd is now configured properly');
+        }
     }
 
     protected function installCloudflared(): void

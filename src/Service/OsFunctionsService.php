@@ -399,4 +399,71 @@ EOF;
         }
         return true;
     }
+
+    public function getValueFromConfig(string $file, string $key): array|bool
+    {
+        $config = $this->readConfig($file);
+        $lines = explode("\n", $config);
+        $pattern = '/^\s*(?!#)\s*' . preg_quote($key, '/') . '\b\s+(.+)$/';
+        foreach ($lines as $line) {
+            if (preg_match($pattern, $line)) {
+                $values = $this->parseConfigValues($line);
+                array_shift($values); // remove key
+                return $values;
+            }
+        }
+        return false;
+    }
+
+    public function setValueInConfig(string $file, string $key, array $values): void
+    {
+        $newLine = $key . ' ' . implode(' ', $values);
+
+        $config = $this->readConfig($file);
+        $lines = explode("\n", $config);
+        foreach ($lines as &$line) {
+            $pattern = '/^\s*(?!#)\s*' . preg_quote($key, '/') . '\b\s+.*/';
+            if (preg_match($pattern, $line)) {
+                $line = $newLine;
+                break; // We assume that the uncommented key occurs only once
+            }
+        }
+        $this->writeConfig($file, implode("\n", $lines));
+    }
+
+    protected function parseConfigValues(string $values): array
+    {
+        $parsedValues = [];
+        $length = strlen($values);
+        $current = '';
+        $inQuotes = false;
+        $quoteChar = null;
+        for ($i = 0; $i < $length; $i++) {
+            $char = $values[$i];
+            if ($inQuotes) {
+                if ($char === $quoteChar) {
+                    $inQuotes = false;
+                    $quoteChar = null;
+                    $parsedValues[] = $current;
+                    $current = '';
+                } else {
+                    $current .= $char;
+                }
+            } elseif ($char === '"' || $char === "'") {
+                $inQuotes = true;
+                $quoteChar = $char;
+            } elseif ($char === ' ') {
+                if ($current !== '') {
+                    $parsedValues[] = $current;
+                    $current = '';
+                }
+            } else {
+                $current .= $char;
+            }
+        }
+        if ($current !== '') {
+            $parsedValues[] = $current;
+        }
+        return $parsedValues;
+    }
 }
