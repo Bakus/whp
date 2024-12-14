@@ -212,8 +212,8 @@ class InstallSystemSoftwareCommand extends Command
 
     protected function checkProftpdConfiguration(): void
     {
-        $port = $this->osFunctions->getValueFromConfig('proftpd.conf', 'Port');
-        $defaultServer = $this->osFunctions->getValueFromConfig('proftpd.conf', 'DefaultServer');
+        $port = $this->osFunctions->getValueFromConfig('/etc/proftpd/proftpd.conf', 'Port');
+        $defaultServer = $this->osFunctions->getValueFromConfig('/etc/proftpd/proftpd.conf', 'DefaultServer');
         if (
             !($port === false || $port[0] == 0)
             ||
@@ -223,10 +223,10 @@ class InstallSystemSoftwareCommand extends Command
             $defaultServerInfo = is_array($defaultServer) ? $defaultServer[0] : "not found or commented out";
             $this->io->info("ProFTPd is not configured properly. Fixing...");
             if (isset($portInfo)) {
-                $this->osFunctions->setValueInConfig('proftpd.conf', 'Port', ['0']);
+                $this->osFunctions->setValueInConfig('/etc/proftpd/proftpd.conf', 'Port', ['0']);
             }
             if (isset($defaultServerInfo)) {
-                $this->osFunctions->setValueInConfig('proftpd.conf', 'DefaultServer', ['off']);
+                $this->osFunctions->setValueInConfig('/etc/proftpd/proftpd.conf', 'DefaultServer', ['off']);
             }
             $this->io->success('ProFTPd is now configured properly');
         }
