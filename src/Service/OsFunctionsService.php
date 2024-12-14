@@ -14,6 +14,7 @@ class OsFunctionsService
     protected array $configPlaces = [
         '/etc/apache2/sites-enabled/*',
         '/etc/apache2/conf-enabled/000_dirs.conf',
+        '/etc/proftpd/proftpd.conf',
         '/etc/proftpd/conf.d/*',
     ];
 
@@ -148,6 +149,7 @@ class OsFunctionsService
                     'mtime' => filemtime($file),
                     'status' => 'unknown',
                     'content' => $getContents ? $this->readConfig($file) : null,
+                    'sensitive' => in_array($file, $this->sensitiveFiles),
                 ];
             }
         }
@@ -400,10 +402,12 @@ EOF;
         return true;
     }
 
-    public function getValueFromConfig(string $file, string $key): array|bool
+    public function getValueFromConfig(string $file, string $key, null|string $content = null): array|bool
     {
-        $config = $this->readConfig($file);
-        $lines = explode("\n", $config);
+        if ($content === null) {
+            $content = $this->readConfig($file);
+        }
+        $lines = explode("\n", $content);
         $pattern = '/^\s*(?!#)\s*' . preg_quote($key, '/') . '\b\s+(.+)$/';
         foreach ($lines as $line) {
             if (preg_match($pattern, $line)) {
@@ -415,12 +419,32 @@ EOF;
         return false;
     }
 
-    public function setValueInConfig(string $file, string $key, array $values): void
+    /**
+     * Sets value in config file
+     * If key is not found, it will be added at the end of the file
+     * If key is found, it will be replaced
+     * Function assumes that key is unique in the file
+     * If $content is not provided, file will be read from disk
+     * If $saveFile is true, file will be saved after setting the value, otherwise content will be returned
+     *
+     * @param string $file
+     * @param string $key
+     * @param array $values
+     * @param string|null $content
+     * @param bool $saveFile
+     * @return bool|string
+     * @throws RuntimeException
+     * @throws ProcessFailedException
+     */
+    public function setValueInConfig(string $file, string $key, array $values, null|string $content = null, bool $saveFile = false): bool|string
     {
-        $newLine = $key . ' ' . implode(' ', $values);
+        if ($content === null) {
+            $content = $this->readConfig($file);
+        }
 
-        $config = $this->readConfig($file);
-        $lines = explode("\n", $config);
+        $newLine = $key . ' ' . implode(' ', $values);
+        $lines = explode("\n", $content);
+
         foreach ($lines as &$line) {
             $pattern = '/^\s*(?!#)\s*' . preg_quote($key, '/') . '\b\s+.*/';
             if (preg_match($pattern, $line)) {
@@ -428,7 +452,14 @@ EOF;
                 break; // We assume that the uncommented key occurs only once
             }
         }
-        $this->writeConfig($file, implode("\n", $lines));
+
+        $content = implode("\n", $lines);
+
+        if ($saveFile) {
+            $this->writeConfig($file, $content);
+            return true;
+        }
+        return $content;
     }
 
     protected function parseConfigValues(string $values): array

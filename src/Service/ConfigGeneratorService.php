@@ -54,6 +54,25 @@ class ConfigGeneratorService
             'dbpass' => $_ENV['PROFTPD_DBPASS'],
         ]);
 
+        $proftpdConf = $this->osFunctions->readConfig('/etc/proftpd/proftpd.conf');
+        $port = $this->osFunctions->getValueFromConfig('/etc/proftpd/proftpd.conf', 'Port', $proftpdConf);
+        $defaultServer = $this->osFunctions->getValueFromConfig('/etc/proftpd/proftpd.conf', 'DefaultServer', $proftpdConf);
+        if (
+            !($port === false || $port[0] == 0)
+            ||
+            !($defaultServer === false || strtolower($defaultServer[0]) == 'off')
+        ) {
+            $portInfo = ($port !== false) ? $port[0] : "not found or commented out";
+            $defaultServerInfo = is_array($defaultServer) ? $defaultServer[0] : "not found or commented out";
+            if (isset($portInfo)) {
+                $proftpdConf = $this->osFunctions->setValueInConfig('/etc/proftpd/proftpd.conf', 'Port', ['0'], $proftpdConf, false);
+            }
+            if (isset($defaultServerInfo)) {
+                $proftpdConf = $this->osFunctions->setValueInConfig('/etc/proftpd/proftpd.conf', 'DefaultServer', ['off'], $proftpdConf, false);
+            }
+        }
+        $this->files['/etc/proftpd/proftpd.conf'] = $proftpdConf;
+
         $repository = $this->em->getRepository(IpAddress::class);
         $ipAddresses = $repository->findBy(
             ['is_active' => true],
