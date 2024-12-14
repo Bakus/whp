@@ -86,13 +86,13 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ ea_url().setRoute('downloadConfigFile', {'file': file} ) }}" title="Download config file from server"><span class="fa-fw fas file-arrow-down"></span></a>
+                        <a href="{{ ea_url().setRoute('downloadConfigFile', {'file': file} ) }}" title="Download config file from server"><i class="fa-fw fas fa-file-arrow-down"></i></a>
                         {% if diffs_enabled and data.diff != '' %}
-                            <a href="#" title="Show DIFF" onclick="showDiff('diff{{ file | replace({'/': '_', '.': '_'}) }}'); return false;"><span class="fa-fw fas fa-code-compare"></span></a>
+                            <a href="#" title="Show DIFF" onclick="showDiff('diff{{ file | replace({'/': '_', '.': '_'}) }}'); return false;"><i class="fa-fw fas fa-code-compare"></i></a>
                             <div class="d-none" id="diff{{ file | replace({'/': '_', '.': '_'}) }}">{{ data.diff | raw }}</div>
                         {% endif %}
                         {% if data.rendered %}
-                            <a href="{{ ea_url().setRoute('downloadConfigFileGenerated', {'file': file} ) }}" title="Download generated config file"><span class="fa-fw fas fa-cloud-arrow-down"></span></a>
+                            <a href="{{ ea_url().setRoute('downloadConfigFileGenerated', {'file': file} ) }}" title="Download generated config file"><i class="fa-fw fas fa-cloud-arrow-down"></i></a>
                         {% endif %}
                     </td>
                 </tr>
