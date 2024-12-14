@@ -182,7 +182,7 @@ class OsFunctionsService
         }
 
         $username = posix_getpwuid(posix_getuid())['name'];
-        $workingDir = dirname(__DIR__);
+        $workingDir = realpath(dirname(__DIR__) . '/../');
 
         $serviceFile = <<<EOF
 [Unit]
