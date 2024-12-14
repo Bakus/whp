@@ -1,5 +1,7 @@
 <VirtualHost {{ ip.ipAddress }}>
+{% if ip.SslCert.CrtFile is defined %}
     TLSRSACertificateFile       {{ ip.SslCert.CrtFile }}
     TLSRSACertificateKeyFile    {{ ip.SslCert.KeyFile }}
     TLSCACertificateFile        {{ ip.SslCert.CaFile }}
+{% endif %}
 </VirtualHost>
