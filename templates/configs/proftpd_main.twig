@@ -32,24 +32,24 @@ Port                    0
     TLSVerifyClient     off
     TLSRenegotiate      none
     TLSOptions          NoSessionReuseRequired
+
+    SQLBackend          mysql
+    SQLEngine           on
+    SQLAuthenticate     users
+    SQLAuthTypes        OpenSSL
+    SQLConnectInfo      {{ dbname }}@{{ dbhost }} {{ dbuser }} {{ dbpass }}
+    SQLUserInfo         user username password uid uid home_dir NULL
+    SQLUserWhereClause  "is_active = 1"
+
+    SQLMinID            1000
+    CreateHome          on
+    RequireValidShell   off
+
+    # Update count every time user logs in
+    SQLLog              PASS updatecount
+    SQLNamedQuery       updatecount UPDATE "ftp_login_count=ftp_login_count+1, ftp_last_login=now() WHERE username='%u' LIMIT 1" user
+
+    # Update modified everytime user uploads or deletes a file
+    SQLLog              STOR,DELE modified
+    SQLNamedQuery       modified UPDATE "ftp_last_modified=now() WHERE username='%u' LIMIT 1" user
 </Global>
-
-SQLBackend              mysql
-SQLEngine               on
-SQLAuthenticate         users
-SQLAuthTypes            OpenSSL
-SQLConnectInfo          {{ dbname }}@{{ dbhost }} {{ dbuser }} {{ dbpass }}
-SQLUserInfo             user username password uid uid home_dir NULL
-SQLUserWhereClause      "is_active = 1"
-
-SQLMinID                1000
-CreateHome              on
-RequireValidShell       off
-
-# Update count every time user logs in
-SQLLog                  PASS updatecount
-SQLNamedQuery           updatecount UPDATE "ftp_login_count=ftp_login_count+1, ftp_last_login=now() WHERE username='%u' LIMIT 1" user
-
-# Update modified everytime user uploads or deletes a file
-SQLLog                  STOR,DELE modified
-SQLNamedQuery           modified UPDATE "ftp_last_modified=now() WHERE username='%u' LIMIT 1" user
