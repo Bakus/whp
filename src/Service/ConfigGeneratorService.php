@@ -189,6 +189,17 @@ class ConfigGeneratorService
             ]);
         }
 
+        /**
+         * Override PHP-FPM settings from PHP entity
+         */
+        $phpOverrive = $this->em->getRepository(Php::class)
+            ->findAll();
+        foreach ($phpOverrive as $php) {
+            $this->files['/etc/php/' . $php->getVersion() . '/fpm/pool.d/' . $php->getUser() . '.conf'] = $this->twig->render('configs/php_fpm_pool_override.twig', [
+                'config' => $php,
+            ]);
+        }
+
         ksort($this->files);
         return $this->files;
     }
